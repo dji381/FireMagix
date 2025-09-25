@@ -3,10 +3,7 @@ uniform vec3 uSecondaryColor;
 uniform float uGlowPower;
 uniform float uAlphaIntensity;
 uniform float uSecondaryRadius;
-uniform float uTime;
 varying vec2 vUvs;
-varying vec3 vNormals;
-varying vec3 vPosition;
 varying float vBump;
 
 #include "../../lygia/generative/fbm.glsl"
@@ -16,7 +13,7 @@ void main() {
     vec2 center = vec2(0.5);
     float noise = fbm((vUvs * 5.0));
     float d = distance(center, vUvs);
-    if(d + noise * 0.2 > 0.5) {
+    if(d + noise * 0.2 > 0.42) {
         discard;
     }
 
