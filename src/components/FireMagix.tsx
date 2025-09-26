@@ -12,6 +12,7 @@ import { folder, useControls } from "leva";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import FireParticles from "./FireParticles";
+import HitParticles from "./HitParticles";
 
 const FIreMagix = () => {
   const shaderRef = useRef<any>(null!);
@@ -129,8 +130,8 @@ const FIreMagix = () => {
         />
       </mesh>
       {/* Fireball */}
-         <mesh position={[0, 0.5, 0]}>
-        <sphereGeometry args={[.2]} />
+         <mesh position={[0, 0.0, 0]}>
+        <sphereGeometry args={[.3]} />
         <CustomShaderMaterial<typeof THREE.MeshStandardMaterial>
           baseMaterial={THREE.MeshStandardMaterial}
           ref={shaderFireballRef}
@@ -148,7 +149,8 @@ const FIreMagix = () => {
           }}
         />
       </mesh>
-      <FireParticles/>
+      {/* <FireParticles/> */}
+      <HitParticles/>
     </>
   );
 };
