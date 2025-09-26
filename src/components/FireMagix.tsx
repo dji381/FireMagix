@@ -11,6 +11,7 @@ import { useRef } from "react";
 import { folder, useControls } from "leva";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
+import FireParticles from "./FireParticles";
 
 const FIreMagix = () => {
   const shaderRef = useRef<any>(null!);
@@ -68,13 +69,13 @@ const FIreMagix = () => {
       uSecondaryFireBallColor: "#db8503",
       uRayFireBallColor: "#581d0f",
       uGlowFire: {
-        value: 2.0,
+        value: 5.0,
         min:1.0,
         max:10.0,
         step: 1,
       },
        uFresnelFire: {
-        value: 3.0,
+        value: 1.5,
         min:1.0,
         max:10.0,
         step: 0.5,
@@ -147,6 +148,7 @@ const FIreMagix = () => {
           }}
         />
       </mesh>
+      <FireParticles/>
     </>
   );
 };
