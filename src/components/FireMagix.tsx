@@ -12,13 +12,25 @@ import { folder, useControls } from "leva";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import FireParticles from "./FireParticles";
-import HitParticles from "./HitParticles";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 
+gsap.registerPlugin(useGSAP);
 const FIreMagix = () => {
   const shaderRef = useRef<any>(null!);
   const shaderAlchemyRef = useRef<any>(null!);
   const shaderFireballRef = useRef<any>(null!);
-  const alechemyTexture = useTexture('/textures/alchemy.jpg');
+  const shaderParticuleRef = useRef<any>(null!);
+  const alechemyTexture = useTexture("/textures/alchemy.jpg");
+  const { contextSafe } = useGSAP(() => {});
+  const handleAnimation = contextSafe(() => {
+    gsap.timeline()
+    .to(shaderAlchemyRef.current.uniforms.uAlpha, {value: 1.0, duration: 4})
+    .to(shaderRef.current.uniforms.uPos, {value: 1.0, duration: 2.5,ease:"expo.out"},'<')
+    .to(shaderParticuleRef.current.uniforms.uParticleSystemWidth,{value: 1.0, duration: 3,ease:"expo.out"},'<+=1.0')
+    .to(shaderParticuleRef.current.uniforms.uAnimationProgress,{value: 50.0, duration: 5,ease:"expo.in"},'<')
+    .to(shaderFireballRef,{})
+  });
   const {
     uDisplacementColor,
     uSecondaryColor,
@@ -32,7 +44,6 @@ const FIreMagix = () => {
     uRayFireBallColor,
     uGlowFire,
     uFresnelFire,
-    
   } = useControls("FireMagix", {
     Lava: folder({
       uDisplacementColor: "#b54221",
@@ -65,24 +76,25 @@ const FIreMagix = () => {
     Alchemy: folder({
       uPrimaryColor: "#6f1f08",
     }),
-    Fireball:folder({
-      uPrimaryFireBallColor:"#b54221",
+    Fireball: folder({
+      uPrimaryFireBallColor: "#b54221",
       uSecondaryFireBallColor: "#db8503",
       uRayFireBallColor: "#581d0f",
       uGlowFire: {
         value: 5.0,
-        min:1.0,
-        max:10.0,
+        min: 1.0,
+        max: 10.0,
         step: 1,
       },
-       uFresnelFire: {
+      uFresnelFire: {
         value: 1.5,
-        min:1.0,
-        max:10.0,
+        min: 1.0,
+        max: 10.0,
         step: 0.5,
-      }
-    })
+      },
+    }),
   });
+
   useFrame((state) => {
     if (shaderRef.current?.uniforms) {
       shaderRef.current.uniforms.uTime.value = state.clock.elapsedTime;
@@ -92,7 +104,7 @@ const FIreMagix = () => {
   });
   return (
     <>
-      <mesh position={[0, 0, 0]} rotation={[-Math.PI * 0.5, 0, 0]}>
+      <mesh position={[0, -1, 0]} rotation={[-Math.PI * 0.5, 0, 0]} >
         <planeGeometry args={[1, 1, 250, 250]} />
         <CustomShaderMaterial<typeof THREE.MeshStandardMaterial>
           baseMaterial={THREE.MeshStandardMaterial}
@@ -109,6 +121,7 @@ const FIreMagix = () => {
             uBumpIntensity: { value: uBumpIntensity },
             uAlphaIntensity: { value: uAlphaIntensity },
             uSecondaryRadius: { value: uSecondaryRadius },
+            uPos:{value:0.0}
           }}
         />
       </mesh>
@@ -123,15 +136,16 @@ const FIreMagix = () => {
           transparent={true}
           alphaTest={0.1}
           uniforms={{
-            uAlchemyTexture:{value:alechemyTexture},
-            uPrimaryColor:{value:new THREE.Color(uPrimaryColor)},
+            uAlchemyTexture: { value: alechemyTexture },
+            uPrimaryColor: { value: new THREE.Color(uPrimaryColor) },
             uTime: { value: 0.0 },
+            uAlpha:{value: 0.0}
           }}
         />
       </mesh>
       {/* Fireball */}
-         <mesh position={[0, 0.0, 0]}>
-        <sphereGeometry args={[.3]} />
+      <mesh position={[0, 0.8, 0]} onClick={handleAnimation}>
+        <sphereGeometry args={[0.5]} />
         <CustomShaderMaterial<typeof THREE.MeshStandardMaterial>
           baseMaterial={THREE.MeshStandardMaterial}
           ref={shaderFireballRef}
@@ -140,17 +154,20 @@ const FIreMagix = () => {
           transparent={true}
           alphaTest={0.5}
           uniforms={{
-            uPrimaryFireBallColor:{value:new THREE.Color(uPrimaryFireBallColor)},
-            uSecondaryFireBallColor:{value:new THREE.Color(uSecondaryFireBallColor)},
-            uRayFireBallColor:{value: new THREE.Color(uRayFireBallColor)},
+            uPrimaryFireBallColor: {
+              value: new THREE.Color(uPrimaryFireBallColor),
+            },
+            uSecondaryFireBallColor: {
+              value: new THREE.Color(uSecondaryFireBallColor),
+            },
+            uRayFireBallColor: { value: new THREE.Color(uRayFireBallColor) },
             uTime: { value: 0.0 },
-            uGlowFire:{value:uGlowFire},
-            uFresnelFire:{value:uFresnelFire}
+            uGlowFire: { value: uGlowFire },
+            uFresnelFire: { value: uFresnelFire },
           }}
         />
       </mesh>
-      {/* <FireParticles/> */}
-      <HitParticles/>
+     <FireParticles shaderRef={shaderParticuleRef} />
     </>
   );
 };

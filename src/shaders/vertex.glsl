@@ -1,5 +1,6 @@
 uniform float uTime;
 uniform float uBumpIntensity;
+uniform float uPos;
 varying vec2 vUvs;
 varying vec3 vNormals;
 varying vec3 vPosition;
@@ -16,6 +17,7 @@ void main() {
   
   newPos.z += bump * uBumpIntensity;
   newPos.z += noise * 0.3;
+  newPos.z += uPos;
   csm_Position = newPos;
   vUvs = uv;
   vNormals = (modelMatrix * vec4(normal, 0.0)).xyz;

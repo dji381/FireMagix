@@ -1,5 +1,6 @@
 uniform vec3 uPrimaryColor;
 uniform vec3 uSecondaryColor;
+uniform float uParticleSystemWidth;
 uniform sampler2D uTexture;
 varying vec3 vPos;
 
@@ -14,5 +15,6 @@ void main(){
     }
     color = texel.xyz * color;
     color *= 5.0;
-    gl_FragColor = vec4(color,texel.r);
+    float alpha = min(uParticleSystemWidth,texel.r);
+    gl_FragColor = vec4(color,alpha);
 }
